@@ -2,7 +2,7 @@ import json
 
 def cleanIngredients(ingredients):
     """
-    Deletes the ADVERTISEMENT at the end of each ingredient, if applicable.
+    Deletes 'ADVERTISEMENT' in ingredient, if applicable.
     """
     new_ingredient_list = []
     for ingredient in ingredients:
@@ -15,6 +15,7 @@ def cleanIngredients(ingredients):
 
 def cleanInstructions(instructions):
     """
+    Handles issue where first step in instructions is a string of all instructions, leading to duplicates
     Converts the string of instructions to a numbered list of instructions.
     """
     new_instructions_list = []
@@ -33,7 +34,7 @@ def cleanInstructions(instructions):
 def main():
     id = 0
     new_data = {}
-    data_to_clean = ['recipes_raw_nosource_ar.json', 'recipes_raw_nosource_epi.json', 'recipes_raw_nosource_fn.json']
+    data_to_clean = ['dataCleanup/recipes_raw_nosource_ar.json', 'dataCleanup/recipes_raw_nosource_epi.json', 'dataCleanup/recipes_raw_nosource_fn.json']
     for i in range(len(data_to_clean)):
     
         with open(data_to_clean[i], "r") as recipe_file:
@@ -59,23 +60,23 @@ def main():
             
             if id % 5000 == 0:
                 try:
-                    with open("combined_and_cleaned_recipes.json", "r") as file:
+                    with open("dataCleanup/combined_and_cleaned_recipes.json", "r") as file:
                         data = json.load(file)
                 except FileNotFoundError:
                     data = {}
                 data.update(new_data)
 
-                with open("combined_and_cleaned_recipes.json", "w") as file:
+                with open("dataCleanup/combined_and_cleaned_recipes.json", "w") as file:
                     json.dump(data, file, indent=4)
                 new_data = {}
             id += 1
         
-        # Add any leftover data in new_data
-        with open("combined_and_cleaned_recipes.json", "r") as file:
+        # # Add any leftover data in new_data
+        with open("dataCleanup/combined_and_cleaned_recipes.json", "r") as file:
                 data = json.load(file)
         data.update(new_data)
 
-        with open("combined_and_cleaned_recipes.json", "w") as file:
+        with open("dataCleanup/combined_and_cleaned_recipes.json", "w") as file:
             json.dump(data, file, indent=4)
         new_data = {}
 
@@ -83,6 +84,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    # with open("combined_and_cleaned_recipes.json", "r") as in_file:
-    #     data = json.load(in_file)
-

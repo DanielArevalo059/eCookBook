@@ -52,7 +52,7 @@ def createFileNoDups(true_dups, data):
             continue
         new_data[id] = data[recipe]
         id += 1
-    with open("combined_cleaned_nodups_recipes.json", "w") as out:
+    with open("backend/combined_cleaned_nodups_recipes.json", "w") as out:
         json.dump(new_data, out, indent=4)
     
 
@@ -63,6 +63,6 @@ def main(data):
 
 
 if __name__ == "__main__":
-    with open("combined_and_cleaned_recipes.json", "r") as in_file:
+    with open("dataCleanup/combined_and_cleaned_recipes.json", "r") as in_file:
         data = json.load(in_file)
     main(data)
