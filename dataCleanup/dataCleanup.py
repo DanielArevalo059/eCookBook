@@ -1,40 +1,10 @@
 import json
+from cleanIngredientsInstructions import CleanIngredientsAndInstructions as cii
+from clearDuplicates import ClearDuplicates as cdup
 
-def cleanIngredients(ingredients):
-    """
-    Deletes 'ADVERTISEMENT' in ingredient, if applicable.
-    """
-    new_ingredient_list = []
-    for ingredient in ingredients:
-        ingredient_list = ingredient.split()
-        ingredient_list = [item for item in ingredient_list if item != "ADVERTISEMENT"]
-        new_ingredient_string = " ".join(ingredient_list)
-        if new_ingredient_string:
-            new_ingredient_list.append(new_ingredient_string)
-    return new_ingredient_list
-
-def cleanInstructions(instructions):
-    """
-    Handles issue where first step in instructions is a string of all instructions, leading to duplicates
-    Converts the string of instructions to a numbered list of instructions.
-    """
-    new_instructions_list = []
-    step_num = 1
-    instructions_list = instructions.split("\n")
-    if len(instructions_list) > 1 and instructions_list[1] in instructions_list[0]:
-        instructions_list = instructions_list[1:]
-    for i in instructions_list: 
-        if i:
-            inst_str = f'{str(step_num)}. {i}'
-            new_instructions_list.append(inst_str)
-            step_num += 1
-    return new_instructions_list
-    
-
-def main():
+def dataCleanup(data_to_clean):    
     id = 0
     new_data = {}
-    data_to_clean = ['dataCleanup/recipes_raw_nosource_ar.json', 'dataCleanup/recipes_raw_nosource_epi.json', 'dataCleanup/recipes_raw_nosource_fn.json']
     for i in range(len(data_to_clean)):
     
         with open(data_to_clean[i], "r") as recipe_file:
@@ -46,8 +16,8 @@ def main():
             if not recipes[rec]:
                 continue
             if recipes[rec]["ingredients"] and recipes[rec]["instructions"]:
-                new_ingredient_list = cleanIngredients(recipes[rec]["ingredients"])
-                new_instructions_list = cleanInstructions(recipes[rec]["instructions"])
+                new_ingredient_list = cii.cleanIngredients(recipes[rec]["ingredients"])
+                new_instructions_list = cii.cleanInstructions(recipes[rec]["instructions"])
             else: 
                 continue
 
@@ -80,7 +50,17 @@ def main():
             json.dump(data, file, indent=4)
         new_data = {}
 
+    # Clear true duplicates
+    with open("dataCleanup/combined_and_cleaned_recipes.json", "r") as in_file:
+        data = json.load(in_file)
+    dup_title_ids = cdup.checkDuplicates(data)
+    true_dups = cdup.verifyDuplicateRecipes(dup_title_ids, data)
+    cdup.createFileNoDups(true_dups, data)
 
+
+def main():
+    data_to_clean = ['dataCleanup/recipes_raw_nosource_ar.json', 'dataCleanup/recipes_raw_nosource_epi.json', 'dataCleanup/recipes_raw_nosource_fn.json']
+    dataCleanup(data_to_clean)
 
 if __name__ == "__main__":
     main()
